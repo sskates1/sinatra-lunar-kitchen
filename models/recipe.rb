@@ -13,15 +13,13 @@ end
 
 
 class Recipe
-  attr_reader :id, :name
+  attr_reader :id, :name, :instructions,:description
 
-  def initialize(id)
-    query = "SELECT * FROM recipes WHERE id = $1"
-    recipe = db_connection do |conn|
-      conn.exec_params(query,[id])
-    end
+  def initialize(id, name, instructions, description)
     @id = id
-    @name = recipe.to_a[0]["name"]
+    @name = name
+    @instructions = instructions
+    @description = description
   end
 
 
@@ -30,7 +28,11 @@ class Recipe
     recipes = db_connection do |conn|
       conn.exec(query)
     end
-    return recipes.to_a
+    recipes_objects = []
+    recipes.to_a.each do |recipe|
+      recipes_objects << Recipe.new(recipe["id"], recipe["name"], recipe["instructions"], recipe["description"])
+    end
+    return recipes_objects
   end
 
 
