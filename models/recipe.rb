@@ -1,4 +1,5 @@
 require 'pg'
+require 'pry'
 
 def db_connection
   begin
@@ -33,6 +34,19 @@ class Recipe
       recipes_objects << Recipe.new(recipe["id"], recipe["name"], recipe["instructions"], recipe["description"])
     end
     return recipes_objects
+  end
+
+  def self.find(id)
+    query = "SELECT * FROM recipes WHERE id = $1"
+    recipe = db_connection do |conn|
+      conn.exec_params(query, [id])
+    end
+
+    recipe = recipe.to_a
+    recipe = recipe[0]
+    recipe = Recipe.new(recipe["id"], recipe["name"], recipe["instructions"], recipe["description"])
+
+    return recipe
   end
 
 
